@@ -7,6 +7,7 @@
   "MT_CONFIG value")
 
 (setq perl-compile-bin (concat "cd " mt-home "; perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib "));
+(setq prove-bin (concat "cd " mt-home "; prove -v "));
 
 (define-minor-mode mt-mode
       "Toggle MT mode.
@@ -23,16 +24,20 @@
       :group 'MT)
 
 (defun is-perl-file (file-name)
-  "Return t if the file is a perl (.pm, .pl, t) file"
-  (if (string-match "\\(\\.pm\\|\\.pl\\|\\.t\\)$" file-name)
+  "Return t if the file is a perl (.pm, .pl) file"
+  (if (string-match "\\(\\.pm\\|\\.pl\\)$" file-name)
+      t
+    nil))
+
+(defun is-test-file (file-name)
+  "Return t if the file is a unit test (.t) file"
+  (if (string-match "\\.t$" file-name)
       t
     nil))
 
 (defun is-plugin-file (file-name)
   "Return t if the path represents a plugin file (contains 'plugins' - simple but effective for now)"
-  (if (and
-       (is-perl-file file-name)
-       (string-match "plugins" file-name))
+  (if (string-match "plugins" file-name)
       t
     nil))
 
@@ -47,10 +52,12 @@
 
 (defun mt-rel-path (file-name)
   "return the path relative to mt-home"
-  ; full file path - mt-home
-  (if (string-match mt-home file-name)
-      (substring file-name (+ (length mt-home) 1))
-    (substring file-name (string-match "plugins" file-name))))
+  (message file-name)
+  (cond ((string-match mt-home file-name)
+	 (substring file-name (+ (length mt-home) 1)))
+	((is-plugin-file file-name)
+	 (substring file-name (string-match "plugins" file-name)))
+	))
 
 (defun mt-perl-compile ()
   "Call perl -c. 
@@ -67,8 +74,22 @@ Runs 'perl -c' on the current buffer, first attempting to locate the file in an 
       (message (concat "file " (file-name-nondirectory buffer-file-name) " is not a perl file!"))
     (with-output-to-temp-buffer "perl-c" 
       (message perl-compile-command)
-      (print (concat "perl- c output: " (shell-command-to-string 
+      (print (concat "perl -c output: " (shell-command-to-string 
        perl-compile-command))))))
+
+(defun mt-run-test ()
+  "Call prove on test file.
+Runs 'prove -v' on the current buffer, assuming it's a .t file"
+  (interactive)
+  (setq prove-command (concat prove-bin (mt-rel-path buffer-file-name)))
+   (if (not (is-test-file buffer-file-name))
+      (message (concat "file " (file-name-nondirectory buffer-file-name) " is not a test file!"))
+    (if (mt-rel-path buffer-file-name)
+	(with-output-to-temp-buffer "prove-v" 
+	  (message prove-command)
+	  (print (concat "prove -v output: " 
+			 (shell-command-to-string prove-command))))
+      (message "Cannot determine mt-rel-path for file"))))
 
 ; testing
 ; (mt-perl-compile)
