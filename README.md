@@ -15,4 +15,4 @@ The first useful command is `mt-perl-compile`, which runs the current buffer thr
 
 #### Contact
 
-Any questions, comments, or praise can be sent to steveivy@gmail.com.
+Any questions, comments, or praise can be sent to <steveivy@gmail.com>.
