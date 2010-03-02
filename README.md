@@ -8,6 +8,9 @@ This is an emacs minor mode with some useful functions for developing Movable Ty
     (message "loading mt-mode")
     (autoload 'mt-mode "mt-mode" nil t)
     (global-set-key (kbd "C-c c") 'mt-perl-compile)
+    (global-set-key (kbd "C-c t") 'mt-run-test)
+
+It's also important to set `mt-home` and `mt-config` in your `.emacs`. They default to "~/mte" and "mt-config.cgi" respectively.
 
 ### mt-perl-compile
 
