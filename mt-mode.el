@@ -24,25 +24,26 @@
       :group 'MT)
 
 (defun is-perl-file (file-name)
-  "Return t if the file is a perl (.pm, .pl) file"
+  "Return t if the file is a perl (.pm, .pl) file."
   (if (string-match "\\(\\.pm\\|\\.pl\\)$" file-name)
       t
     nil))
 
 (defun is-test-file (file-name)
-  "Return t if the file is a unit test (.t) file"
+  "Return t if the file is a unit test (.t) file."
   (if (string-match "\\.t$" file-name)
       t
     nil))
 
 (defun is-plugin-file (file-name)
-  "Return t if the path represents a plugin file (contains 'plugins' - simple but effective for now)"
+  "Return t if the path represents a plugin file.
+   Return t is the path contains 'plugins' - simple but effective for now."
   (if (string-match "plugins" file-name)
       t
     nil))
 
 (defun plugin-lib-dir (file-name)
-  "return the mt-relative path to a plugin's lib directory"
+  "Return an mt-relative path to a plugin's lib directory"
   (if (not (is-plugin-file file-name))
       nil
     (substring file-name 0 
@@ -51,7 +52,7 @@
 		3))))
 
 (defun mt-rel-path (file-name)
-  "return the path relative to mt-home"
+  "Determine a file's path relative to mt-home"
   (message file-name)
   (cond ((string-match mt-home file-name)
 	 (substring file-name (+ (length mt-home) 1)))
@@ -79,7 +80,7 @@ Runs 'perl -c' on the current buffer, first attempting to locate the file in an 
 
 (defun mt-run-test ()
   "Call prove on test file.
-Runs 'prove -v' on the current buffer, assuming it's a .t file"
+   Runs 'prove -v' on the current buffer, after checking that it's a unit test (.t) file"
   (interactive)
   (setq prove-command (concat prove-bin (mt-rel-path buffer-file-name)))
    (if (not (is-test-file buffer-file-name))
@@ -90,6 +91,8 @@ Runs 'prove -v' on the current buffer, assuming it's a .t file"
 	  (print (concat "prove -v output: " 
 			 (shell-command-to-string prove-command))))
       (message "Cannot determine mt-rel-path for file"))))
+
+; TODO: work out a convention for finding a test file starting from a .pm file
 
 ; testing
 ; (mt-perl-compile)
