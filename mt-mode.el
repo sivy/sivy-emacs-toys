@@ -6,7 +6,7 @@
 (defvar mt-config "~/mte/mt-config.cgi" 
   "MT_CONFIG value")
 
-(setq perl-compile-bin "perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib ");
+(setq perl-compile-bin (concat "cd " mt-home "; perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib "));
 
 (define-minor-mode mt-mode
       "Toggle MT mode.
@@ -47,16 +47,15 @@
   "Call perl -c. 
 Runs 'perl -c' on the current buffer, first attempting to locate the file in an MT install and setup the -I libs properly."
   (interactive)
+  (setq perl-compile-command  (concat 
+	perl-compile-bin
+	(mt-rel-path buffer-file-name)))
   (if (not (is-perl-file buffer-file-name))
       (message (concat "file " (file-name-nondirectory buffer-file-name) " is not a perl file!"))
     (with-output-to-temp-buffer "perl-c" 
-      (message  (concat 
-	perl-compile-bin
-	(mt-rel-path buffer-file-name)))
-      (shell-command-to-string 
-       (concat 
-	perl-compile-bin
-	(mt-rel-path buffer-file-name))))))
+      (message perl-compile-command)
+      (print (concat "perl- c output: " (shell-command-to-string 
+       perl-compile-command))))))
 
 ; testing
 ; (mt-perl-compile)
