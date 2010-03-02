@@ -11,6 +11,11 @@ This is an emacs minor mode with some useful functions for developing Movable Ty
     (global-set-key (kbd "C-c t") 'mt-run-test)
 
 It's also important to set `mt-home` and `mt-config` in your `.emacs`. They default to "~/mte" and "mt-config.cgi" respectively.
+     ; path to mt
+    (setq mt-home "/path/to/your/mte")
+    ; path to mt-config.cgi
+    (setq mt-config (concat mt-home "/mt-config.cgi"))
+
 
 ### mt-perl-compile
 
