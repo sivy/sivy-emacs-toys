@@ -16,6 +16,10 @@ It's also important to set `mt-home` and `mt-config` in your `.emacs`. They defa
 
 The first useful command is `mt-perl-compile`, which runs the current buffer through perl -c. This can be done with compile-command, but I build it myself and run the command, sending the output to a temporary buffer so it can be reviewed. Also, this way we can find the lib directory in the plugin and make sure that it's included as a `-I` with `perl -c`.
 
+### mt-run-test
+
+Runs `prove -v` on the current buffer, after checking that it's a `.t` file.
+
 #### Contact
 
 Any questions, comments, or praise can be sent to <steveivy@gmail.com>.
