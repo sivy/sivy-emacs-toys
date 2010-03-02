@@ -36,20 +36,33 @@
       t
     nil))
 
+(defun plugin-lib-dir (file-name)
+  "return the mt-relative path to a plugin's lib directory"
+  (if (not (is-plugin-file file-name))
+      nil
+    (substring file-name 0 
+	       (+ 
+		(string-match "lib" file-name) 
+		3))))
+
 (defun mt-rel-path (file-name)
   "return the path relative to mt-home"
   ; full file path - mt-home
   (if (string-match mt-home file-name)
-      (substring file-name (length mt-home))
+      (substring file-name (+ (length mt-home) 1))
     (substring file-name (string-match "plugins" file-name))))
 
 (defun mt-perl-compile ()
   "Call perl -c. 
 Runs 'perl -c' on the current buffer, first attempting to locate the file in an MT install and setup the -I libs properly."
   (interactive)
-  (setq perl-compile-command  (concat 
-	perl-compile-bin
-	(mt-rel-path buffer-file-name)))
+  (setq perl-compile-command  
+	(concat 
+	 perl-compile-bin
+	 (plugin-lib-dir (mt-rel-path buffer-file-name))
+	 " "
+	 (mt-rel-path buffer-file-name)))
+  
   (if (not (is-perl-file buffer-file-name))
       (message (concat "file " (file-name-nondirectory buffer-file-name) " is not a perl file!"))
     (with-output-to-temp-buffer "perl-c" 
