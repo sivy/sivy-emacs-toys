@@ -32,4 +32,7 @@ Runs 'perl -c' on the current buffer, first attempting to locate the file in an 
   (let ((thisbuf (current-buffer)))
     (message buffer-file-name)))
 
+(defvar mt-home "~/mte" "MT_HOME directory")
+(defvar mt-config "~/mte/mt-config.cgi" "MT_CONFIG value")
+
 (mt-perl-compile)
