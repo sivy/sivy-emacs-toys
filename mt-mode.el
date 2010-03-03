@@ -1,5 +1,12 @@
-;; mt-mode.el
-;; functions useful to writing MT code, esp plugins
+;;; mt-mode.el --- minor mode for writing MT code, esp plugins
+
+;; Copyright (C) 2010 Steve Ivy
+;; Author: Steve Ivy <sivy@sixapart.com>
+;;    David Rayners <draynes@sixapart.com>
+;; Maintainer: Steve Ivy<sivy@sixapart.com>
+;; Created: 01 Mar 2010
+;; Version: 0.2
+;; Keywords: movabletype
 
 (defcustom mt-home "~/mte"
   "MT_HOME directory"
