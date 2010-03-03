@@ -1,10 +1,15 @@
 ;; mt-mode.el
 ;; functions useful to writing MT code, esp plugins
 
-(defvar mt-home "~/mte"
-  "MT_HOME directory")
-(defvar mt-config "~/mte/mt-config.cgi" 
-  "MT_CONFIG value")
+(defcustom mt-home "~/mte"
+  "MT_HOME directory"
+  :type 'string
+  :group 'MT)
+
+(defcustom mt-config "~/mte/mt-config.cgi" 
+  "MT_CONFIG value"
+  :type 'string
+  :group 'MT)
 
 (setq perl-compile-bin (concat "cd " mt-home "; perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib "));
 (setq prove-bin (concat "cd " mt-home "; prove -v "));
