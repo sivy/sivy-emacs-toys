@@ -3,7 +3,7 @@
 ;; Copyright (C) 2010 Steve Ivy
 ;; Author: Steve Ivy <sivy@sixapart.com>
 ;;    David Rayners <draynes@sixapart.com>
-;; Maintainer: Steve Ivy<sivy@sixapart.com>
+;; Maintainer: Steve Ivy <sivy@sixapart.com>
 ;; Created: 01 Mar 2010
 ;; Version: 0.2
 ;; Keywords: movabletype
