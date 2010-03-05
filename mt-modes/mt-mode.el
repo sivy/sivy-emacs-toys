@@ -43,21 +43,20 @@
   :group 'MT)
 
 (setq perl-compile-bin (concat "cd " mt-home "; perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib "));
-(setq prove-bin (concat "cd " mt-home "; prove -v "));
 
 (define-minor-mode mt-mode
-      "Toggle MT mode.
+  "Toggle MT mode.
       With no argument, this command toggles the mode.
       Non-null prefix argument turns on the mode.
       Null prefix argument turns off the mode."
-     
-      ;; The initial value.
-      nil
-      ;; The indicator for the mode line.
-      " MT"
-      ;; The minor mode bindings.
-      '(("\C-\c?" . mt-perl-compile))
-      :group 'MT)
+  
+  ;; The initial value.
+  nil
+  ;; The indicator for the mode line.
+  " MT"
+  ;; The minor mode bindings.
+  '()
+  :group 'MT)
 
 (defun is-perl-file (file-name)
   "Return t if the file is a perl (.pm, .pl) file."
@@ -65,15 +64,9 @@
       t
     nil))
 
-(defun is-test-file (file-name)
-  "Return t if the file is a unit test (.t) file."
-  (if (string-match "\\.t$" file-name)
-      t
-    nil))
-
 (defun is-plugin-file (file-name)
   "Return t if the path represents a plugin file.
-   Return t is the path contains 'plugins' - simple but effective for now."
+   Return t if the path contains 'plugins' - simple but effective for now."
   (if (string-match "plugins" file-name)
       t
     nil))
@@ -103,6 +96,7 @@ Runs 'perl -c' on the current buffer, first attempting to locate the file in an 
   (setq perl-compile-command  
 	(concat 
 	 perl-compile-bin
+	 "-I"
 	 (plugin-lib-dir (mt-rel-path buffer-file-name))
 	 " "
 	 (mt-rel-path buffer-file-name)))
@@ -112,17 +106,39 @@ Runs 'perl -c' on the current buffer, first attempting to locate the file in an 
     (with-output-to-temp-buffer "perl-c" 
       (message perl-compile-command)
       (print (concat "perl -c output: " (shell-command-to-string 
-       perl-compile-command))))))
+					 perl-compile-command))))))
 
 (defun mt-run-test ()
   "Call prove on test file.
    Runs 'prove -v' on the current buffer, after checking that it's a unit test (.t) file"
   (interactive)
-  (setq prove-command (concat prove-bin (mt-rel-path buffer-file-name)))
-   (if (not (is-test-file buffer-file-name))
+  (if (not (is-test-file buffer-file-name))
       (message (concat "file " (file-name-nondirectory buffer-file-name) " is not a test file!"))
     (if (mt-rel-path buffer-file-name)
 	(with-output-to-temp-buffer "prove-v" 
+	  (setq prove-command (concat prove-bin (mt-rel-path buffer-file-name)))
+	  (message prove-command)
+	  (print (concat "prove -v output: " 
+			 (shell-command-to-string prove-command))))
+      (message "Cannot determine mt-rel-path for file"))))
+
+(defun mt-run-all-tests ()
+  "Call prove on test file.
+   Runs 'prove -v' on the current buffer, after checking that it's a unit test (.t) file"
+  (interactive)
+  (if (not (is-test-file buffer-file-name))
+      (message (concat "file " (file-name-nondirectory buffer-file-name) " is not a test file!"))
+    (if (mt-rel-path buffer-file-name)
+	(with-output-to-temp-buffer "prove-v all"
+	  (setq prove-command 
+		(concat prove-bin 
+			(substring
+			 (mt-rel-path buffer-file-name) 
+			 0
+			 (+
+			  (string-match "\/t\/" (mt-rel-path buffer-file-name))
+			  3))
+			"*.t"))
 	  (message prove-command)
 	  (print (concat "prove -v output: " 
 			 (shell-command-to-string prove-command))))
