@@ -31,6 +31,19 @@
 ;; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 ;; THE SOFTWARE.
 
+
+(defcustom mt-home "~/mte"
+  "MT_HOME directory"
+  :type 'string
+  :group 'MT)
+
+(defcustom mt-config "~/mte/mt-config.cgi" 
+  "MT_CONFIG value"
+  :type 'string
+  :group 'MT)
+
+(setq perl-compile-bin (concat "cd " mt-home "; perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib "));
+
 (define-minor-mode mt-mode
   "Toggle MT mode.
       With no argument, this command toggles the mode.
@@ -45,80 +58,55 @@
   '()
   :group 'MT)
 
-(setq perl-compile-bin (concat "cd " mt-home "; perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib -Iaddons/Enterprise.pack/lib "))
-(setq prove-bin (concat "cd " mt-home "; prove -v "));
-
 (defun is-perl-file (file-name)
   "Return t if the file is a perl (.pm, .pl) file."
   (if (string-match "\\(\\.pm\\|\\.pl\\)$" file-name)
       t
     nil))
 
-(defun mt-rel-path (file-name)
-  "Determine a file's path relative to mt-home"
-  (message file-name)
-  (cond ((string-match ( regexp-quote mt-home) file-name)
-	 (substring file-name (+ (length mt-home) 1)))
-	((is-plugin-file file-name)
-	 (substring file-name (string-match "plugins" file-name)))
-	))
-
-(defun is-mt-file (file-name)
-  "Return t if the file can be determined to be an MT file.
-      Return t if the file is a plugin file, or can be determined to be located under an MT installation"
-  (if (mt-rel-path file-name)
-      t
-    nil))
-
 (defun is-plugin-file (file-name)
   "Return t if the path represents a plugin file.
    Return t if the path contains 'plugins' - simple but effective for now."
-  (if (string-match (regexp-quote "plugins") file-name)
+  (if (string-match "plugins" file-name)
       t
     nil))
 
 (defun plugin-lib-dir (file-name)
   "Return an mt-relative path to a plugin's lib directory"
-  (if (is-plugin-file file-name)
-      (substring file-name 0 
-		 (+ 
-		  (string-match "lib" file-name) 
-		  3))
-    nil))
+  (if (not (is-plugin-file file-name))
+      nil
+    (substring file-name 0 
+	       (+ 
+		(string-match "lib" file-name) 
+		3))))
 
-(defun load-mt-mode-conditionally ()
-  (message (concat "checking is-mt-file... " buffer-file-name))
-  (if (is-mt-file buffer-file-name)
-      (mt-mode)))
+(defun mt-rel-path (file-name)
+  "Determine a file's path relative to mt-home"
+  (message file-name)
+  (cond ((string-match mt-home file-name)
+	 (substring file-name (+ (length mt-home) 1)))
+	((is-plugin-file file-name)
+	 (substring file-name (string-match "plugins" file-name)))
+	))
 
 (defun mt-perl-compile ()
   "Call perl -c. 
 Runs 'perl -c' on the current buffer, first attempting to locate the file in an MT install and setup the -I libs properly."
   (interactive)
-  (message (concat "mt-perl-compile buffer: " buffer-file-name))
-  (setq buffer-rel-path (mt-rel-path buffer-file-name))
-  (message (concat "mt-perl-compile: " buffer-rel-path))
-  (unless (string-equal "" buffer-rel-path)
-    (setq perl-compile-command  
-	  (concat 
-	   perl-compile-bin
-	   "-I"
-	   (plugin-lib-dir buffer-rel-path)
-	   " "
-	   buffer-rel-path))
-    
-    (if (not (is-perl-file buffer-file-name))
+  (setq perl-compile-command  
+	(concat 
+	 perl-compile-bin
+	 "-I"
+	 (plugin-lib-dir (mt-rel-path buffer-file-name))
+	 " "
+	 (mt-rel-path buffer-file-name)))
+  
+  (if (not (is-perl-file buffer-file-name))
       (message (concat "file " (file-name-nondirectory buffer-file-name) " is not a perl file!"))
     (with-output-to-temp-buffer "perl-c" 
       (message perl-compile-command)
       (print (concat "perl -c output: " (shell-command-to-string 
-					 perl-compile-command)))))))
-
-(defun is-test-file (file-name)
-  "Return t if the file is a unit test (.t) file."
-  (if (string-match "\\.t$" file-name)
-      t
-    nil))
+					 perl-compile-command))))))
 
 (defun mt-run-test ()
   "Call prove on test file.
@@ -151,14 +139,26 @@ Runs 'perl -c' on the current buffer, first attempting to locate the file in an 
 			  (string-match "\/t\/" (mt-rel-path buffer-file-name))
 			  3))
 			"*.t"))
-					;(message prove-command)
+	  (message prove-command)
 	  (print (concat "prove -v output: " 
 			 (shell-command-to-string prove-command))))
       (message "Cannot determine mt-rel-path for file"))))
 
-(message "loaded mt-mode")
+; auto-load
 
-					; Notes
-					; "Symbol's function definition is void"
+
+; Add this to the list of minor modes.
+;; (if (not (assq 'mt-mode minor-mode-alist))
+;;     (setq minor-mode-alist
+;;           (cons '(mt-mode " MT")
+;;                 minor-mode-alist)))
+
+; TODO: work out a convention for finding a test file starting from a .pm file
+
+; testing
+; (mt-perl-compile)
+
+; Notes
+; "Symbol's function definition is void"
 ;  -- you may have wrapped a variable arg to a function in (), so it's trying to call the var as a function
 ;  -- i.e. (length (some-var)) ; some-var is not a function

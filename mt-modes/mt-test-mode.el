@@ -33,27 +33,31 @@
 ; mt-mode must be loaded first, as mt-test-mode depends on several variables from mt-mode.
 ; don't know how to best handle this dependency
 
+(require 'mt-util)
+
 (setq prove-bin (concat "cd " mt-home "; prove -v "));
 
 (define-minor-mode mt-test-mode
-      "Toggle MT-Test mode.
+  "Toggle MT-Test mode.
       With no argument, this command toggles the mode.
       Non-null prefix argument turns on the mode.
       Null prefix argument turns off the mode."
-     
-      ;; The initial value.
-      nil
-      ;; The indicator for the mode line.
-      " MT-Test"
-      ;; The minor mode bindings.
-      '()
-      :group 'MT)
+  
+  ;; The initial value.
+  nil
+  ;; The indicator for the mode line.
+  " MT-Test"
+  ;; The minor mode bindings.
+  '()
+  :group 'MT)
 
 (defun is-test-file (file-name)
   "Return t if the file is a unit test (.t) file."
   (if (string-match "\\.t$" file-name)
       t
     nil))
+
+
 
 (defun mt-run-test ()
   "Call prove on test file.
@@ -91,5 +95,4 @@
 			 (shell-command-to-string prove-command))))
       (message "Cannot determine mt-rel-path for file"))))
 
-(mt-run-test)
-(mt-run-all-tests)
+(message "loaded mt-test-mode")
