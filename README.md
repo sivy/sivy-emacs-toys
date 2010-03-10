@@ -1,17 +1,34 @@
 # mt-modes
 
-
-
 These are some emacs minor modes with some useful functions for developing Movable Type plugins in perl. The easiest way to set it up is to do something like this in your `.emacs` file:
 
-    ;; ------------------------------
-    ;; make sure mt-modes is in your load path
-    ;; mt-mode
-    (message "loading mt-modes")
-    (autoload 'mt-mode "mt-mode" nil t)
-    (autoload 'mt-test-mode "mt-test-mode" nil t)
-    (global-set-key (kbd "C-c c") 'mt-perl-compile)
-    (global-set-key (kbd "C-c t") 'mt-run-test)
+	;; ------------------------------
+	;; mt-modes
+	;; mt-util.el defines the custom settings, and some common functions
+	(require 'mt-util)
+
+	;; autoload the mode functions
+	(autoload 'mt-mode "mt-mode" nil t)
+	(autoload 'mt-test-mode "mt-test-mode" nil t)
+
+	;; my personal bindings for compile (c), test (t), and all tests (a)
+	(global-set-key (kbd "C-c c") 'mt-perl-compile)
+	(global-set-key (kbd "C-c t") 'mt-run-test)
+	(global-set-key (kbd "C-c a") 'mt-run-all-tests)
+
+	;; load MT mode for certain perl files, while keeping
+	;; cperl-mode as the major
+	(eval-after-load "cperl-mode"
+	      '(add-hook 'cperl-mode-hook 'load-mt-mode-conditionally))
+	;; load MT-Test mode for .t files
+	(eval-after-load "cperl-mode"
+	      '(add-hook 'cperl-mode-hook 'load-mt-test-mode-conditionally))
+
+	;; set location of mt
+	(setq mt-home "/path/to/your/mt")
+	(setq mt-config (concat mt-home "/mt-config.cgi"))
+
+	(add-to-list 'auto-mode-alist '("\\.tmpl$" . html-mode))
 
 It's also important to set `mt-home` and `mt-config` in your `.emacs`. They default to "~/mte" and "mt-config.cgi" respectively.
     
