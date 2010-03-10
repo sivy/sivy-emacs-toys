@@ -48,49 +48,6 @@
 (setq perl-compile-bin (concat "cd " mt-home "; perl -c -Ilib -Iextlib -Iaddons/Commercial.pack/lib -Iaddons/Community.pack/lib -Iaddons/Enterprise.pack/lib "))
 (setq prove-bin (concat "cd " mt-home "; prove -v "));
 
-(defun is-perl-file (file-name)
-  "Return t if the file is a perl (.pm, .pl) file."
-  (if (string-match "\\(\\.pm\\|\\.pl\\)$" file-name)
-      t
-    nil))
-
-(defun mt-rel-path (file-name)
-  "Determine a file's path relative to mt-home"
-  (message file-name)
-  (cond ((string-match ( regexp-quote mt-home) file-name)
-	 (substring file-name (+ (length mt-home) 1)))
-	((is-plugin-file file-name)
-	 (substring file-name (string-match "plugins" file-name)))
-	))
-
-(defun is-mt-file (file-name)
-  "Return t if the file can be determined to be an MT file.
-      Return t if the file is a plugin file, or can be determined to be located under an MT installation"
-  (if (mt-rel-path file-name)
-      t
-    nil))
-
-(defun is-plugin-file (file-name)
-  "Return t if the path represents a plugin file.
-   Return t if the path contains 'plugins' - simple but effective for now."
-  (if (string-match (regexp-quote "plugins") file-name)
-      t
-    nil))
-
-(defun plugin-lib-dir (file-name)
-  "Return an mt-relative path to a plugin's lib directory"
-  (if (is-plugin-file file-name)
-      (substring file-name 0 
-		 (+ 
-		  (string-match "lib" file-name) 
-		  3))
-    nil))
-
-(defun load-mt-mode-conditionally ()
-  (message (concat "checking is-mt-file... " buffer-file-name))
-  (if (is-mt-file buffer-file-name)
-      (mt-mode)))
-
 (defun mt-perl-compile ()
   "Call perl -c. 
 Runs 'perl -c' on the current buffer, first attempting to locate the file in an MT install and setup the -I libs properly."
