@@ -56,6 +56,13 @@
 	 (substring file-name (string-match "plugins" file-name)))
 	))
 
+(defun is-mt-file (file-name)
+ "Return t if the file can be determined to be an MT file.
+      Return t if the file is a plugin file, or can be determined to be located under an MT installation"
+ (if (mt-rel-path file-name)
+     t
+   nil))
+
 (defun is-plugin-file (file-name)
   "Return t if the path represents a plugin file.
    Return t if the path contains 'plugins' - simple but effective for now."
@@ -71,14 +78,6 @@
 		(string-match "lib" file-name) 
 		3))
     nil))
-
-
-(defun is-mt-file (file-name)
- "Return t if the file can be determined to be an MT file.
-      Return t if the file is a plugin file, or can be determined to be located under an MT installation"
- (if (mt-rel-path file-name)
-     t
-   nil))
 
 (defun load-mt-mode-conditionally ()
   (message (concat "checking is-mt-file... " buffer-file-name))
