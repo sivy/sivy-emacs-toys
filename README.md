@@ -24,10 +24,7 @@ These are some emacs minor modes with some useful functions for developing Movab
 	(eval-after-load "cperl-mode"
 	      '(add-hook 'cperl-mode-hook 'load-mt-test-mode-conditionally))
 
-	;; set location of mt
-	(setq mt-home "/path/to/your/mt")
-	(setq mt-config (concat mt-home "/mt-config.cgi"))
-
+	;; not really related, but useful
 	(add-to-list 'auto-mode-alist '("\\.tmpl$" . html-mode))
 
 It's also important to set `mt-home` and `mt-config` in your `.emacs`. They default to "~/mte" and "mt-config.cgi" respectively.
